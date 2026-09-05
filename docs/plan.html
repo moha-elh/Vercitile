@@ -3,526 +3,537 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mini-Vercel — Build Plan</title>
+<title>Mini-Vercel — Build Chronicle</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Grand+Hotel&family=Lato:ital,wght@0,400;0,700;0,900;1,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root{
-    --paper:#EFF0EB;
-    --surface:#FBFBF8;
-    --surface-2:#F6F6F1;
-    --ink:#17191A;
-    --ink-soft:#585C56;
-    --ink-faint:#8D918A;
-    --line:#DEDFD8;
-    --line-soft:#E8E9E2;
-    --accent:#0C7A4A;
-    --accent-bright:#12A566;
-    --accent-wash:#E6F1EA;
-    --sans:"Geist",system-ui,-apple-system,sans-serif;
-    --serif:"Instrument Serif",Georgia,serif;
-    --mono:"Geist Mono",ui-monospace,"SF Mono",Menlo,monospace;
-    --r:5px;
+    --paper:#faf7f2;--card:#ffffff;--ink:#241e18;--ink-2:#4d463d;--ink-3:#5f584d;
+    --muted:#8d8375;--muted-2:#9b9084;--faint:#a79c8e;--faint-2:#b3a99b;
+    --line:#ece5da;--line-2:#e8e1d6;--green:#6fa86a;--green-deep:#5c7350;
+    --green-track:#f0eae1;--green-tint:#f4f8f2;--green-tint-line:#dce8d7;--red-wash:#f3ddd6;
+    --orange:#e8843c;--orange-ink:#b8621f;--orange-wash:#fdf0e6;--orange-line:#f2d4b8;--clay:#c2603a;--dark:#241e18;
+    --disp:"Grand Hotel",cursive;--body:"Lato",system-ui,-apple-system,sans-serif;--mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
   }
-
   *{box-sizing:border-box;margin:0;padding:0}
-  html{-webkit-text-size-adjust:100%}
-  body{
-    background:var(--paper);
-    color:var(--ink);
-    font-family:var(--sans);
-    font-weight:400;
-    line-height:1.5;
-    -webkit-font-smoothing:antialiased;
-    padding:0 24px 96px;
-  }
-  .wrap{max-width:920px;margin:0 auto}
-
-  /* ---------- masthead ---------- */
-  .masthead{padding:56px 0 28px}
-  .eyebrow{
-    font-family:var(--mono);
-    font-size:11px;
-    font-weight:500;
-    letter-spacing:.22em;
-    text-transform:uppercase;
-    color:var(--ink-faint);
-  }
-  .title{
-    font-family:var(--serif);
-    font-weight:400;
-    line-height:.98;
-    letter-spacing:-.01em;
-    margin:14px 0 0;
-    font-size:clamp(46px,9vw,82px);
-  }
-  .title em{font-style:italic}
-  .title .plain{
-    display:block;
-    font-family:var(--sans);
-    font-weight:300;
-    font-size:clamp(17px,3.2vw,24px);
-    letter-spacing:.01em;
-    color:var(--ink-soft);
-    margin-top:12px;
-    line-height:1.3;
-  }
-  .meta{
-    display:flex;flex-wrap:wrap;gap:8px;
-    margin-top:22px;
-  }
-  .chip{
-    font-family:var(--mono);
-    font-size:11px;
-    color:var(--ink-soft);
-    background:var(--surface);
-    border:1px solid var(--line);
-    border-radius:999px;
-    padding:5px 11px;
-    letter-spacing:.02em;
-  }
-
-  /* ---------- deploy status / progress ---------- */
-  .status{
-    margin-top:32px;
-    background:var(--surface);
-    border:1px solid var(--line);
-    border-radius:var(--r);
-    padding:20px 22px;
-  }
-  .status__line{
-    display:flex;align-items:baseline;justify-content:space-between;
-    gap:16px;flex-wrap:wrap;
-  }
-  .status__state{
-    font-family:var(--mono);
-    font-size:13px;
-    color:var(--ink);
-    letter-spacing:.01em;
-    display:flex;align-items:center;gap:9px;
-  }
-  .dot{
-    width:9px;height:9px;border-radius:50%;
-    background:var(--ink-faint);flex:none;
-    transition:background .3s ease;
-  }
-  .dot.is-live{background:var(--accent-bright)}
-  .status__count{
-    font-family:var(--serif);
-    font-style:italic;
-    font-size:26px;
-    color:var(--ink);
-    line-height:1;
-  }
-  .status__count b{color:var(--accent);font-style:normal;font-family:var(--sans);font-weight:600;font-size:22px}
-  .rail{
-    margin-top:16px;height:6px;border-radius:999px;
-    background:var(--line-soft);overflow:hidden;
-  }
-  .rail__fill{
-    height:100%;width:0%;
-    background:var(--accent-bright);
-    border-radius:999px;
-    transition:width .5s cubic-bezier(.2,.7,.2,1);
-  }
-  .status__foot{
-    display:flex;justify-content:space-between;align-items:center;
-    margin-top:14px;gap:12px;flex-wrap:wrap;
-  }
-  .status__hint{font-size:12.5px;color:var(--ink-soft)}
-  .reset{
-    font-family:var(--mono);font-size:11px;letter-spacing:.04em;
-    color:var(--ink-faint);background:none;border:none;cursor:pointer;
-    padding:4px 2px;text-transform:uppercase;
-  }
-  .reset:hover{color:var(--ink)}
-
-  /* ---------- releases ---------- */
-  .releases{
-    display:grid;grid-template-columns:repeat(4,1fr);gap:10px;
-    margin-top:14px;
-  }
-  .rel{
-    background:var(--surface);
-    border:1px solid var(--line);
-    border-radius:var(--r);
-    padding:14px 14px 13px;
-    position:relative;overflow:hidden;
-    transition:border-color .3s ease,background .3s ease;
-  }
-  .rel.is-shipped{border-color:var(--accent);background:var(--accent-wash)}
-  .rel__tag{font-family:var(--mono);font-size:12px;font-weight:500;color:var(--ink);letter-spacing:.04em}
-  .rel__name{font-size:12px;color:var(--ink-soft);margin-top:3px}
-  .rel__st{
-    font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;
-    color:var(--ink-faint);margin-top:11px;display:flex;align-items:center;gap:6px;
-  }
-  .rel.is-shipped .rel__st{color:var(--accent)}
-  .rel__st .mini{width:6px;height:6px;border-radius:50%;background:currentColor;opacity:.55}
-  .rel.is-shipped .rel__st .mini{opacity:1}
-
-  /* ---------- section headers ---------- */
-  .sec{margin-top:52px}
-  .sec__head{
-    display:flex;align-items:baseline;gap:14px;
-    padding-bottom:12px;margin-bottom:22px;
-    border-bottom:1px solid var(--line);
-  }
-  .sec__num{font-family:var(--mono);font-size:12px;color:var(--ink-faint);letter-spacing:.1em}
-  .sec__title{font-family:var(--serif);font-style:italic;font-size:30px;font-weight:400;line-height:1}
-  .sec__sub{margin-left:auto;font-size:12.5px;color:var(--ink-soft)}
-
-  /* ---------- week list ---------- */
-  .weeks{list-style:none;display:flex;flex-direction:column;gap:9px}
-  .wk{
-    display:grid;
-    grid-template-columns:56px 1fr 24px;
-    gap:16px;align-items:start;
-    background:var(--surface);
-    border:1px solid var(--line);
-    border-left:3px solid var(--line);
-    border-radius:var(--r);
-    padding:16px 18px;
-    cursor:pointer;
-    transition:border-color .2s ease,background .2s ease;
-  }
-  .wk:hover{border-color:var(--ink-faint)}
-  .wk:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-  .wk.is-done{border-left-color:var(--accent);background:var(--surface-2)}
-  .wk__n{
-    font-family:var(--serif);font-style:italic;font-size:30px;line-height:.9;
-    color:var(--ink-faint);transition:color .2s ease;
-  }
-  .wk.is-done .wk__n{color:var(--accent)}
-  .wk__n small{display:block;font-family:var(--mono);font-style:normal;font-size:9.5px;letter-spacing:.14em;color:var(--ink-faint);margin-top:6px}
+  body{background:var(--paper);color:var(--ink);font-family:var(--body);line-height:1.5;-webkit-font-smoothing:antialiased;padding:30px 28px 80px}
+  .wrap{max-width:1120px;margin:0 auto}
+  .head{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;margin-bottom:22px;flex-wrap:wrap}
+  .eyebrow{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--faint);font-weight:700;margin-bottom:4px}
+  .h-title{font-family:var(--disp);font-size:56px;line-height:.9;color:var(--ink);font-weight:400}
+  .h-sub{font-size:13px;color:var(--muted);margin-top:12px}
+  .h-ctrl{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+  .pill{display:flex;align-items:center;gap:8px;padding:9px 14px;border-radius:10px;font-size:12.5px;font-weight:700}
+  .pill--flag{background:var(--orange-wash);border:1px solid var(--orange-line);color:var(--orange-ink)}
+  .pill--flag.is-live{background:var(--green-tint);border-color:var(--green-tint-line);color:var(--green-deep)}
+  .pill__dot{width:7px;height:7px;border-radius:50%;background:var(--orange);display:block}
+  .pill--flag.is-live .pill__dot{background:var(--green)}
+  .pill--ghost{background:var(--card);border:1px solid var(--line-2);color:var(--ink-3)}
+  .reset{background:var(--dark);color:#fff;border:none;padding:10px 16px;border-radius:10px;font-family:var(--body);font-size:12.5px;font-weight:700;cursor:pointer}
+  .reset:hover{background:#3a3025}
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:14px}
+  .stat{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px 20px}
+  .stat__label{font-size:11.5px;color:var(--muted-2);font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+  .stat__big{display:flex;align-items:baseline;gap:8px;margin-top:10px}
+  .stat__num{font-size:32px;font-weight:900;letter-spacing:-.02em;line-height:1}
+  .stat__delta{font-size:12.5px;font-weight:900;color:var(--green)}
+  .stat__unit{font-size:13px;color:var(--muted)}
+  .stat__bar{height:6px;border-radius:3px;background:var(--green-track);margin-top:12px;overflow:hidden}
+  .stat__fill{height:100%;width:0%;background:var(--green);border-radius:3px;transition:width .5s cubic-bezier(.2,.7,.2,1)}
+  .stat__sub{font-size:11.5px;color:var(--faint);margin-top:8px}
+  .stat__sub b{color:var(--ink-3);font-weight:700}
+  .grid{display:grid;grid-template-columns:1fr 340px;gap:14px}
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:20px 22px 22px}
+  .panel__head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;gap:12px}
+  .panel__title{font-size:16px;font-weight:900;letter-spacing:-.01em}
+  .panel__meta{font-size:11.5px;color:var(--faint);margin-top:3px}
+  .legend{display:flex;gap:14px;align-items:center;font-size:11.5px;color:var(--muted)}
+  .legend span{display:flex;align-items:center;gap:6px}
+  .swatch{width:11px;height:11px;border-radius:3px;display:block}
+  .ribbon{display:flex;flex-direction:column;gap:8px;padding-bottom:18px;margin-bottom:18px;border-bottom:1px solid var(--line)}
+  .rib-row{display:flex;align-items:center;gap:12px}
+  .rib-tag{width:78px;flex:none;font-family:var(--mono);font-size:11px;color:var(--muted);display:flex;align-items:center;gap:7px}
+  .rib-tag b{color:var(--ink);font-weight:600}
+  .rib-cells{display:flex;gap:4px;flex:1}
+  .cell{width:26px;height:22px;border-radius:4px;background:var(--green-track);display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:9.5px;color:var(--faint-2);transition:background .2s ease,color .2s ease}
+  .cell.is-done{background:var(--green);color:#fff}
+  .cell.is-next{background:#fff;border:1px dashed var(--orange);color:var(--orange-ink)}
+  .rib-ship{width:22px;flex:none;text-align:center;font-family:var(--mono);font-size:13px;color:var(--faint-2)}
+  .rib-ship.is-shipped{color:var(--green-deep)}
+  .weeks{display:flex;flex-direction:column;gap:8px}
+  .wk{background:var(--card);border:1px solid var(--line-2);border-radius:14px;transition:border-color .2s ease,background .2s ease}
+  .wk:hover{border-color:var(--faint)}
+  .wk.is-done{background:var(--green-tint);border-color:var(--green-tint-line)}
+  .wk__row{display:grid;grid-template-columns:50px 1fr 24px;gap:15px;align-items:start;padding:14px 16px;cursor:pointer}
+  .wk__row:focus-visible{outline:2px solid var(--green);outline-offset:2px;border-radius:14px}
+  .wk__n{font-size:26px;font-weight:900;letter-spacing:-.02em;line-height:1;color:var(--faint-2);transition:color .2s ease}
+  .wk.is-done .wk__n{color:var(--green-deep)}
+  .wk__n small{display:block;font-family:var(--mono);font-weight:500;font-size:9px;letter-spacing:.12em;color:var(--faint-2);margin-top:5px}
   .wk__body{min-width:0}
-  .wk__stage{
-    display:inline-block;font-family:var(--mono);font-size:10px;font-weight:500;
-    letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft);
-    border:1px solid var(--line);border-radius:3px;padding:1px 6px;margin-bottom:8px;
-  }
-  .wk__do{font-size:14.5px;color:var(--ink);line-height:1.45}
-  .wk__done{
-    font-family:var(--mono);font-size:11.5px;color:var(--ink-soft);
-    margin-top:9px;padding-left:14px;position:relative;line-height:1.5;
-  }
-  .wk__done::before{content:"→";position:absolute;left:0;color:var(--accent)}
-  .wk__done b{color:var(--ink);font-weight:500}
-  .box{
-    width:22px;height:22px;border:1.5px solid var(--ink-faint);border-radius:5px;
-    margin-top:3px;position:relative;flex:none;transition:.2s ease;background:var(--surface);
-  }
-  .wk.is-done .box{background:var(--accent);border-color:var(--accent)}
-  .box::after{
-    content:"";position:absolute;left:7px;top:3px;width:5px;height:10px;
-    border:solid #fff;border-width:0 2px 2px 0;transform:rotate(45deg) scale(0);
-    transition:transform .18s ease;
-  }
+  .wk__top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px}
+  .wk__stage{display:inline-block;font-family:var(--mono);font-size:10px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);border:1px solid var(--line-2);border-radius:4px;padding:1px 6px}
+  .wk__more{font-family:var(--mono);font-size:10px;letter-spacing:.06em;color:var(--faint);white-space:nowrap;display:flex;align-items:center;gap:5px}
+  .wk__more .cv{display:inline-block;transition:transform .2s ease}
+  .wk.is-open .wk__more .cv{transform:rotate(90deg)}
+  .wk.is-open .wk__more{color:var(--green-deep)}
+  .wk__do{font-size:14px;color:var(--ink);line-height:1.45}
+  .wk__done{font-family:var(--mono);font-size:11px;color:var(--muted);margin-top:9px;padding-left:14px;position:relative;line-height:1.5}
+  .wk__done::before{content:"\2192";position:absolute;left:0;color:var(--green)}
+  .wk__done b{color:var(--ink-2);font-weight:600}
+  .mono{font-family:var(--mono);font-size:.92em}
+  .box{width:22px;height:22px;border:1.5px solid var(--faint);border-radius:6px;margin-top:2px;position:relative;flex:none;background:var(--card);transition:.2s ease}
+  .box:focus-visible{outline:2px solid var(--green);outline-offset:2px}
+  .wk.is-done .box{background:var(--green);border-color:var(--green)}
+  .box::after{content:"";position:absolute;left:7px;top:3px;width:5px;height:10px;border:solid #fff;border-width:0 2px 2px 0;transform:rotate(45deg) scale(0);transition:transform .18s ease}
   .wk.is-done .box::after{transform:rotate(45deg) scale(1)}
-
-  .shipnote{
-    grid-column:1 / -1;margin-top:2px;
-    font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;
-    color:var(--accent);display:none;align-items:center;gap:8px;
-  }
+  .shipnote{margin-top:10px;font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--green-deep);display:none;align-items:center;gap:8px}
   .wk.is-milestone.is-done .shipnote{display:flex}
-  .shipnote::before{content:"";height:1px;width:22px;background:var(--accent)}
-
-  /* ---------- launch checklist ---------- */
-  .dod{list-style:none;display:flex;flex-direction:column;gap:2px}
-  .dod li{
-    display:flex;gap:13px;align-items:flex-start;
-    padding:12px 4px;border-bottom:1px solid var(--line-soft);cursor:pointer;
-  }
+  .shipnote::before{content:"";height:1px;width:22px;background:var(--green)}
+  /* detail */
+  .wk__detail{display:none;padding:4px 16px 18px 81px;border-top:1px dashed var(--line-2);margin:0 0 0 0}
+  .wk.is-open .wk__detail{display:block}
+  .det-sec{margin-top:16px}
+  .det-label{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted-2);margin-bottom:8px}
+  .det-sec ol{margin:0;padding:0;list-style:none;counter-reset:m;display:flex;flex-direction:column;gap:8px}
+  .det-sec ol li{position:relative;padding-left:28px;font-size:13px;color:var(--ink-2);line-height:1.5;counter-increment:m}
+  .det-sec ol li::before{content:counter(m);position:absolute;left:0;top:1px;width:19px;height:19px;border-radius:5px;background:var(--green-track);color:var(--green-deep);font-family:var(--mono);font-size:10px;font-weight:600;display:flex;align-items:center;justify-content:center}
+  .det-learn{font-size:13px;color:var(--ink-2);line-height:1.55}
+  .det-learn b{color:var(--ink);font-weight:700}
+  .det-trap{background:var(--orange-wash);border:1px solid var(--orange-line);border-radius:12px;padding:12px 14px}
+  .det-trap .det-label{color:var(--orange-ink);margin-bottom:5px}
+  .det-trap p{font-size:12.5px;color:var(--ink-2);line-height:1.5}
+  .det-trap b{color:var(--orange-ink);font-weight:700}
+  .side{display:flex;flex-direction:column;gap:14px}
+  .cut{background:var(--orange-wash);border:1px solid var(--orange-line);border-radius:18px;padding:18px 20px}
+  .cut__title{font-size:13px;font-weight:900;color:var(--orange-ink);margin-bottom:12px}
+  .cut__item{background:var(--card);border-radius:12px;padding:11px 13px;margin-bottom:8px}
+  .cut__item .k{font-family:var(--mono);font-size:10px;color:var(--orange-ink);letter-spacing:.06em}
+  .cut__item .v{font-size:12.5px;color:var(--ink);font-weight:700;margin-top:3px}
+  .cut__never{font-size:11.5px;color:var(--orange-ink);font-weight:700;margin-top:8px;line-height:1.5}
+  .cut__never span{color:var(--ink)}
+  .launch{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px 20px}
+  .launch__head{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+  .launch__title{font-size:13px;font-weight:900}
+  .launch__meta{font-family:var(--mono);font-size:10.5px;color:var(--faint)}
+  .dod{list-style:none;display:flex;flex-direction:column}
+  .dod li{display:flex;gap:11px;align-items:flex-start;padding:11px 0;border-bottom:1px solid var(--green-track);cursor:pointer}
+  .dod li:last-child{border-bottom:none}
   .dod li:hover .dod__box{border-color:var(--ink)}
-  .dod li:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:3px}
-  .dod__box{
-    width:18px;height:18px;border:1.5px solid var(--ink-faint);border-radius:4px;
-    flex:none;margin-top:1px;position:relative;transition:.2s ease;
-  }
-  .dod li.is-done .dod__box{background:var(--accent);border-color:var(--accent)}
-  .dod__box::after{
-    content:"";position:absolute;left:5.5px;top:2px;width:4px;height:8px;
-    border:solid #fff;border-width:0 2px 2px 0;transform:rotate(45deg) scale(0);transition:transform .18s ease;
-  }
+  .dod li:focus-visible{outline:2px solid var(--green);outline-offset:2px;border-radius:4px}
+  .dod__box{width:17px;height:17px;border:1.5px solid var(--faint);border-radius:5px;flex:none;margin-top:1px;position:relative;transition:.2s ease}
+  .dod li.is-done .dod__box{background:var(--green);border-color:var(--green)}
+  .dod__box::after{content:"";position:absolute;left:5px;top:2px;width:4px;height:8px;border:solid #fff;border-width:0 2px 2px 0;transform:rotate(45deg) scale(0);transition:transform .18s ease}
   .dod li.is-done .dod__box::after{transform:rotate(45deg) scale(1)}
-  .dod__txt{font-size:14px;color:var(--ink);line-height:1.45}
-  .dod li.is-done .dod__txt{color:var(--ink-soft)}
-
-  /* ---------- reference ---------- */
-  details.ref{
-    background:var(--surface);border:1px solid var(--line);border-radius:var(--r);
-    margin-top:10px;overflow:hidden;
-  }
-  details.ref>summary{
-    cursor:pointer;list-style:none;padding:15px 18px;
-    font-family:var(--mono);font-size:12px;letter-spacing:.04em;color:var(--ink);
-    display:flex;align-items:center;justify-content:space-between;
-  }
+  .dod__txt{font-size:12.5px;color:var(--ink-2);line-height:1.4}
+  .dod li.is-done .dod__txt{color:var(--faint)}
+  .refs{margin-top:14px;display:flex;flex-direction:column;gap:10px}
+  details.ref{background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+  details.ref>summary{cursor:pointer;list-style:none;padding:15px 20px;font-family:var(--mono);font-size:12px;color:var(--ink);display:flex;align-items:center;justify-content:space-between}
   details.ref>summary::-webkit-details-marker{display:none}
-  details.ref>summary .plus{color:var(--ink-faint);font-size:15px;transition:transform .2s ease}
+  details.ref>summary .plus{color:var(--faint);font-size:16px;transition:transform .2s ease}
   details.ref[open]>summary .plus{transform:rotate(45deg)}
-  .ref__inner{padding:2px 18px 20px}
+  .ref__in{padding:0 20px 20px}
   table{width:100%;border-collapse:collapse;font-size:13px}
-  table td{padding:8px 10px 8px 0;border-bottom:1px solid var(--line-soft);vertical-align:top;color:var(--ink-soft)}
-  table td:first-child{color:var(--ink);font-weight:500;white-space:nowrap;padding-right:20px}
+  table td{padding:8px 10px 8px 0;border-bottom:1px solid var(--green-track);vertical-align:top;color:var(--muted)}
+  table td:first-child{color:var(--ink);font-weight:700;white-space:nowrap;padding-right:18px}
   table tr:last-child td{border-bottom:none}
-  .mono{font-family:var(--mono);font-size:12px}
-  .cutrow{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px}
-  .cutrow .step{font-family:var(--mono);font-size:11.5px;color:var(--ink-soft);border:1px solid var(--line);border-radius:3px;padding:4px 9px}
-  .cutrow .step b{color:var(--ink)}
-  .never{margin-top:14px;font-size:12.5px;color:var(--ink)}
-  .never b{color:var(--accent)}
-  ul.rules{list-style:none;display:flex;flex-direction:column;gap:11px}
-  ul.rules li{font-size:13.5px;color:var(--ink-soft);padding-left:20px;position:relative;line-height:1.45}
-  ul.rules li::before{content:"—";position:absolute;left:0;color:var(--accent)}
-  ul.rules li b{color:var(--ink);font-weight:500}
-
-  footer{margin-top:60px;padding-top:22px;border-top:1px solid var(--line);
-    font-size:13px;color:var(--ink-soft);font-style:italic;font-family:var(--serif);line-height:1.5}
-
-  @media(max-width:640px){
-    body{padding:0 16px 72px}
-    .releases{grid-template-columns:repeat(2,1fr)}
-    .wk{grid-template-columns:42px 1fr 22px;gap:12px;padding:14px}
-    .wk__n{font-size:24px}
-    .sec__sub{display:none}
-  }
-  @media(prefers-reduced-motion:reduce){
-    *{transition:none!important}
-  }
+  ul.rules{list-style:none;display:flex;flex-direction:column;gap:10px}
+  ul.rules li{font-size:13px;color:var(--muted);padding-left:20px;position:relative;line-height:1.45}
+  ul.rules li::before{content:"\2014";position:absolute;left:0;color:var(--orange)}
+  ul.rules li b{color:var(--ink);font-weight:700}
+  footer{margin-top:32px;text-align:center}
+  footer .flo{font-family:var(--disp);font-size:28px;color:var(--ink-3)}
+  footer .fsub{font-size:12.5px;color:var(--faint);margin-top:2px}
+  @media(max-width:940px){.stats{grid-template-columns:repeat(2,1fr)}.grid{grid-template-columns:1fr}}
+  @media(max-width:560px){body{padding:22px 15px 64px}.h-title{font-size:46px}.stats{grid-template-columns:1fr 1fr}.rib-cells{flex-wrap:wrap}.cell{width:24px}.wk__detail{padding-left:16px}}
+  @media(prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
 <body>
 <div class="wrap">
-
-  <header class="masthead">
-    <div class="eyebrow">Self-hosted deployment platform</div>
-    <h1 class="title"><em>Mini-Vercel</em><span class="plain">Build plan — staged so every stop is a thing that works.</span></h1>
-    <div class="meta">
-      <span class="chip">1–2h / day</span>
-      <span class="chip">no AI for code</span>
-      <span class="chip">Spring Boot · Java 21</span>
-      <span class="chip">15 weeks</span>
+  <header class="head">
+    <div>
+      <div class="eyebrow">Self-hosted deployment platform</div>
+      <div class="h-title">Mini-Vercel</div>
+      <div class="h-sub">Build chronicle &middot; 1&ndash;2h a day &middot; no AI for code &middot; Spring Boot &middot; Java 21</div>
     </div>
-
-    <div class="status">
-      <div class="status__line">
-        <div class="status__state"><span class="dot" id="dot"></span><span id="state">nothing deployed yet</span></div>
-        <div class="status__count"><b id="doneN">0</b> / 15 weeks</div>
-      </div>
-      <div class="rail"><div class="rail__fill" id="fill"></div></div>
-      <div class="status__foot">
-        <div class="status__hint" id="hint">Start with week 1 — nginx from a Java <span class="mono">main()</span>. One afternoon.</div>
-        <button class="reset" id="reset">reset progress</button>
-      </div>
-    </div>
-
-    <div class="releases" id="releases">
-      <div class="rel" data-rel="v0"><div class="rel__tag">v0</div><div class="rel__name">spine</div><div class="rel__st"><span class="mini"></span><span class="lbl">building</span></div></div>
-      <div class="rel" data-rel="v1"><div class="rel__tag">v1</div><div class="rel__name">usable</div><div class="rel__st"><span class="mini"></span><span class="lbl">building</span></div></div>
-      <div class="rel" data-rel="v2"><div class="rel__tag">v2</div><div class="rel__name">live</div><div class="rel__st"><span class="mini"></span><span class="lbl">building</span></div></div>
-      <div class="rel" data-rel="v3"><div class="rel__tag">v3</div><div class="rel__name">portfolio</div><div class="rel__st"><span class="mini"></span><span class="lbl">building</span></div></div>
+    <div class="h-ctrl">
+      <div class="pill pill--flag" id="statusPill"><span class="pill__dot"></span><span id="statusText">15 weeks to ship</span></div>
+      <div class="pill pill--ghost">1&ndash;2h / day</div>
+      <button class="reset" id="reset">Reset progress</button>
     </div>
   </header>
 
-  <!-- ===== WEEKS ===== -->
-  <section class="sec">
-    <div class="sec__head">
-      <span class="sec__num">01</span>
-      <h2 class="sec__title">The build</h2>
-      <span class="sec__sub">tap a week to mark it shipped</span>
+  <section class="stats">
+    <div class="stat">
+      <div class="stat__label">Completion</div>
+      <div class="stat__big"><span class="stat__num" id="pct">0%</span><span class="stat__delta" id="pctDelta">start</span></div>
+      <div class="stat__bar"><div class="stat__fill" id="pctFill"></div></div>
+      <div class="stat__sub"><b id="doneN">0</b> of 15 weeks shipped</div>
     </div>
-    <ul class="weeks" id="weeks"></ul>
+    <div class="stat">
+      <div class="stat__label">Longest run</div>
+      <div class="stat__big"><span class="stat__num" id="runN">0</span><span class="stat__unit">weeks straight</span></div>
+      <div class="stat__sub" id="runSub">No streak yet &mdash; week 1 starts it</div>
+    </div>
+    <div class="stat">
+      <div class="stat__label">Releases</div>
+      <div class="stat__big"><span class="stat__num" id="relN">0</span><span class="stat__unit">of 4 shipped</span></div>
+      <div class="stat__sub">Next: <b id="relNext">v0 &middot; spine</b></div>
+    </div>
+    <div class="stat">
+      <div class="stat__label">Next up</div>
+      <div class="stat__big"><span class="stat__num" id="nextW">W1</span><span class="stat__unit" id="nextStage">v0</span></div>
+      <div class="stat__sub"><b id="nextFocus">Docker from Java</b></div>
+    </div>
   </section>
 
-  <!-- ===== LAUNCH CHECKLIST ===== -->
-  <section class="sec">
-    <div class="sec__head">
-      <span class="sec__num">02</span>
-      <h2 class="sec__title">Launch checklist</h2>
-      <span class="sec__sub">true when the whole thing is done</span>
+  <div class="grid">
+    <div class="panel">
+      <div class="panel__head">
+        <div>
+          <div class="panel__title">The build</div>
+          <div class="panel__meta">15 weeks across 4 releases &middot; tap a week for steps, the box to ship it</div>
+        </div>
+        <div class="legend">
+          <span><span class="swatch" style="background:var(--green)"></span>shipped</span>
+          <span><span class="swatch" style="background:var(--green-track)"></span>to do</span>
+          <span><span class="swatch" style="background:#fff;border:1px dashed var(--orange)"></span>next</span>
+        </div>
+      </div>
+      <div class="ribbon" id="ribbon"></div>
+      <ul class="weeks" id="weeks"></ul>
     </div>
-    <ul class="dod" id="dod"></ul>
-  </section>
 
-  <!-- ===== REFERENCE ===== -->
-  <section class="sec">
-    <div class="sec__head">
-      <span class="sec__num">03</span>
-      <h2 class="sec__title">Reference</h2>
-    </div>
+    <aside class="side">
+      <div class="cut">
+        <div class="cut__title">If you slip &mdash; cut in this order</div>
+        <div class="cut__item"><div class="k">CUT 1ST</div><div class="v">Auto-rollback (wk 15)</div></div>
+        <div class="cut__item"><div class="k">CUT 2ND</div><div class="v">Extra Grafana panels (wk 13)</div></div>
+        <div class="cut__item"><div class="k">CUT 3RD</div><div class="v">ZAP deep triage &mdash; keep baseline</div></div>
+        <div class="cut__never">Never cut: <span>v0 spine &middot; one live deploy &middot; OPA &middot; tests.</span></div>
+      </div>
+      <div class="launch">
+        <div class="launch__head">
+          <div class="launch__title">Launch checklist</div>
+          <div class="launch__meta" id="dodMeta">0 / 9</div>
+        </div>
+        <ul class="dod" id="dod"></ul>
+      </div>
+    </aside>
+  </div>
 
+  <div class="refs">
     <details class="ref">
       <summary>Tech stack<span class="plus">+</span></summary>
-      <div class="ref__inner"><table>
+      <div class="ref__in"><table>
         <tr><td>Language</td><td>Java 21</td></tr>
-        <tr><td>Backend</td><td>Spring Boot — Web, Data JPA, Security, Actuator</td></tr>
+        <tr><td>Backend</td><td>Spring Boot &mdash; Web, Data JPA, Security, Actuator</td></tr>
         <tr><td>Migrations</td><td>Flyway</td></tr>
         <tr><td>Database</td><td>PostgreSQL</td></tr>
         <tr><td>Docker control</td><td>docker-java <span class="mono">(fallback: ProcessBuilder + docker CLI)</span></td></tr>
         <tr><td>Queue</td><td>DB-backed job + <span class="mono">@Scheduled</span> worker (no Redis)</td></tr>
         <tr><td>Proxy + HTTPS</td><td>Caddy</td></tr>
         <tr><td>Frontend</td><td>React + Vite</td></tr>
-        <tr><td>Tests</td><td>JUnit 5 + Mockito · Testcontainers · Playwright</td></tr>
+        <tr><td>Tests</td><td>JUnit 5 + Mockito &middot; Testcontainers &middot; Playwright</td></tr>
         <tr><td>CI/CD</td><td>GitHub Actions</td></tr>
-        <tr><td>Security scan</td><td>Trivy · OWASP ZAP</td></tr>
-        <tr><td>Infra</td><td>Terraform (provision) · Ansible (configure)</td></tr>
-        <tr><td>Metrics</td><td>Micrometer → Prometheus → Grafana</td></tr>
+        <tr><td>Security scan</td><td>Trivy &middot; OWASP ZAP</td></tr>
+        <tr><td>Infra</td><td>Terraform (provision) &middot; Ansible (configure)</td></tr>
+        <tr><td>Metrics</td><td>Micrometer &rarr; Prometheus &rarr; Grafana</td></tr>
         <tr><td>Policy</td><td>OPA + Rego</td></tr>
       </table></div>
     </details>
-
-    <details class="ref">
-      <summary>Cut order if you slip<span class="plus">+</span></summary>
-      <div class="ref__inner">
-        <div class="cutrow">
-          <span class="step"><b>1st</b> · auto-rollback (wk 15)</span>
-          <span class="step"><b>2nd</b> · extra Grafana panels (wk 13)</span>
-          <span class="step"><b>3rd</b> · ZAP deep triage — keep baseline</span>
-        </div>
-        <p class="never">Never cut: <b>v0 spine · one live deploy · OPA · tests.</b></p>
-      </div>
-    </details>
-
     <details class="ref">
       <summary>Rules that keep you moving<span class="plus">+</span></summary>
-      <div class="ref__inner"><ul class="rules">
-        <li>Start week 1 <b>today</b> — the single win the summer never gave you.</li>
+      <div class="ref__in"><ul class="rules">
+        <li>Start week 1 <b>today</b> &mdash; the single win the summer never gave you.</li>
         <li><b>Ugly-but-working beats clean-but-late.</b> You can refactor a thing that runs.</li>
-        <li>If docker-java fights you, switch to the docker CLI fallback <b>fast</b> — don't lose 3 days to thin docs.</li>
-        <li><b>Never write Terraform and Ansible in the same week</b> — two mental models at once is where people quit.</li>
+        <li>If docker-java fights you, switch to the docker CLI fallback <b>fast</b>.</li>
+        <li><b>Never write Terraform and Ansible in the same week</b> &mdash; two mental models at once is where people quit.</li>
         <li>When Ansible fails, do it by hand over SSH first, <b>then</b> translate to a playbook.</li>
         <li>Set an AWS billing alarm at <b>$5</b> before creating anything. <span class="mono">terraform destroy</span> when away.</li>
       </ul></div>
     </details>
-  </section>
+  </div>
 
-  <footer>Reaching week 8 with v1 solid is already a win — and a real portfolio piece. Everything after is upside.</footer>
-
+  <footer>
+    <div class="flo">one deploy that works is already a win</div>
+    <div class="fsub">Reaching week 8 with v1 solid is a real portfolio piece. Everything after is upside.</div>
+  </footer>
 </div>
 
 <script>
 (function(){
   "use strict";
-
-  // ---- storage (guarded so it works locally and no-ops in sandboxes) ----
-  var KEY="minivercel-plan-v1";
-  var store={
-    read:function(){try{return JSON.parse(localStorage.getItem(KEY))||{}}catch(e){return {}}},
-    write:function(o){try{localStorage.setItem(KEY,JSON.stringify(o))}catch(e){}}
-  };
+  var KEY="minivercel-chronicle-v1";
+  var store={read:function(){try{return JSON.parse(localStorage.getItem(KEY))||{}}catch(e){return {}}},write:function(o){try{localStorage.setItem(KEY,JSON.stringify(o))}catch(e){}}};
   var state=store.read();
-
-  // ---- data ----
   var WEEKS=[
-    {n:1, s:"v0", do:"docker-java scratch: start nginx from a <span class='mono'>main()</span>, open it, stop it.", done:"You control Docker from Java."},
-    {n:2, s:"v0", do:"Spring skeleton + Postgres (Compose) + Flyway. Entities: Project, Deployment.", done:"App boots, tables exist."},
-    {n:3, s:"v0", do:"<b>Spine:</b> endpoint → clone hardcoded repo → build → run on a port.", done:"curl → your app on <span class='mono'>localhost:4001</span>.", ship:"v0 spine shipped"},
-    {n:4, s:"v1", do:"Caddy local + free-port picker → subdomain routing.", done:"<span class='mono'>myapp.localhost</span> loads it."},
-    {n:5, s:"v1", do:"Move build to <span class='mono'>@Scheduled</span> DB-queue worker (off the request thread).", done:"Deploys queue and run one at a time."},
-    {n:6, s:"v1", do:"React dashboard: add project, deploy button, status, history.", done:"No more curl."},
-    {n:7, s:"v1", do:"Spring Security single-user login.", done:"Dashboard needs a login."},
-    {n:8, s:"v1", do:"GitHub webhook + HMAC verify. Env vars encrypted.", done:"<span class='mono'>git push</span> triggers a deploy.", ship:"v1 usable shipped"},
-    {n:9, s:"v3", do:"Tests backwards: Playwright happy path → Testcontainers → JUnit units.", done:"<span class='mono'>mvn test</span> green."},
-    {n:10,s:"v3", do:"GitHub Actions: lint → test → build → Trivy → push ECR.", done:"Red X on a bad PR."},
-    {n:11,s:"v2", do:"Terraform: EC2, RDS, ECR, Route53, S3 (no app yet).", done:"<span class='mono'>terraform apply</span> → an SSH-able box."},
-    {n:12,s:"v2", do:"Ansible: Docker, Caddy, OPA, user, firewall. Deploy for real.", done:"Live on your domain, over HTTPS.", ship:"v2 live shipped"},
-    {n:13,s:"v3", do:"Prometheus + Grafana. Wire Actuator, custom metrics, one dashboard.", done:"A deploy moves a graph."},
-    {n:14,s:"v3", do:"OPA admission control + <span class='mono'>opa test</span>.", done:"A bad-branch deploy is BLOCKED, with a reason."},
-    {n:15,s:"v3", do:"Stretch: auto-rollback. Then ZAP scan + README + demo.", done:"Broken deploy → old version stays up.", ship:"v3 portfolio shipped"}
+    {n:1,s:"v0",short:"Docker from Java",dohtml:"docker-java scratch: start nginx from a <span class='mono'>main()</span>, open it, stop it.",done:"You control Docker from Java.",
+     moves:[
+       "Confirm <span class='mono'>docker ps</span> works in your terminal &mdash; docker-java talks to that same socket.",
+       "Add the docker-java dependency; find its helper for building a <b>DockerClient</b>.",
+       "Pull the nginx image, then create and start a container, publishing port 80 to a host port.",
+       "Print the host port and open it in your browser.",
+       "Stop and remove the container from code so you don't leak it."],
+     learn:"The Docker socket, image vs container, and port publishing. Skim docker-java's README for the <b>DockerClient</b> builder and its <span class='mono'>...Cmd</span> objects (pull / create / start).",
+     trap:"<b>pullImageCmd is async</b> &mdash; you must await it before creating the container. If setup drags past ~90 min, shell out to <span class='mono'>docker run</span> via ProcessBuilder and keep moving."},
+
+    {n:2,s:"v0",short:"Spring + Postgres",dohtml:"Spring skeleton + Postgres (Compose) + Flyway. Entities: Project, Deployment.",done:"App boots, tables exist.",
+     moves:[
+       "Generate the project on start.spring.io: Web, Data JPA, PostgreSQL driver, Flyway, Validation.",
+       "Bring up Postgres with docker-compose; point <span class='mono'>application.yml</span> at it.",
+       "Write your first Flyway migration creating <span class='mono'>project</span> and <span class='mono'>deployment</span> tables.",
+       "Add JPA entities + repositories for both; boot the app and watch Flyway run."],
+     learn:"What JPA/Hibernate actually does, and why versioned migrations (Flyway) beat auto-generated schema for anything you'll keep.",
+     trap:"Don't let Hibernate <span class='mono'>ddl-auto</span> AND Flyway both own the schema &mdash; pick Flyway. Store your status as a string, not an enum ordinal."},
+
+    {n:3,s:"v0",short:"The spine",dohtml:"<b>Spine:</b> endpoint &rarr; clone hardcoded repo &rarr; build &rarr; run on a port.",done:"curl &rarr; your app on <span class='mono'>localhost:4001</span>.",ship:"v0 spine shipped",
+     moves:[
+       "Add a POST endpoint &mdash; hardcode a repo URL + branch for now.",
+       "Clone the repo to a temp dir (shell <span class='mono'>git</span> or JGit, your call).",
+       "Build an image from its Dockerfile, tagged with the deployment id.",
+       "Run a container from that image on a free host port; return the port.",
+       "Move the Deployment row through QUEUED &rarr; RUNNING &rarr; SUCCESS as you go."],
+     learn:"How <span class='mono'>docker build</span> maps to docker-java's build command, image tagging, and capturing build output so failures are legible.",
+     trap:"Build logs stream &mdash; <b>capture them</b> or a failed build is a silent mystery. If the build fights you, prove the flow with a prebuilt image first, then add the build step."},
+
+    {n:4,s:"v1",short:"Caddy routing",dohtml:"Caddy local + free-port picker &rarr; subdomain routing.",done:"<span class='mono'>myapp.localhost</span> loads it.",
+     moves:[
+       "Run Caddy locally and find its admin API (it takes JSON config over HTTP on :2019).",
+       "Write a free-port picker in Java (bind port 0, read what the OS hands back).",
+       "When a container starts, push a route to Caddy: <span class='mono'>app.localhost</span> &rarr; the container's port.",
+       "Load the subdomain and confirm it proxies through."],
+     learn:"The reverse-proxy idea, Caddy's admin API shape (routes / handlers / upstreams), and why <span class='mono'>*.localhost</span> resolves with no DNS on most machines.",
+     trap:"Caddy's JSON config is deeply nested &mdash; read one working example before hand-writing it. Keep routing in an adapter class, not your controller."},
+
+    {n:5,s:"v1",short:"Job queue",dohtml:"Move build to <span class='mono'>@Scheduled</span> DB-queue worker (off the request thread).",done:"Deploys queue and run one at a time.",
+     moves:[
+       "Make the endpoint just insert a <span class='mono'>QUEUED</span> row and return immediately.",
+       "Write a <span class='mono'>@Scheduled</span> worker that claims the oldest QUEUED row and runs the build.",
+       "Mark it RUNNING while working, SUCCESS/FAILED at the end.",
+       "Guarantee only one runs at once with a conditional claim update."],
+     learn:"Why slow work leaves the request thread, how <span class='mono'>@Scheduled</span> + <span class='mono'>@EnableScheduling</span> work, and using an UPDATE's affected-row count as a lightweight lock.",
+     trap:"Two workers grabbing the same row &mdash; a conditional <span class='mono'>UPDATE ... WHERE status='QUEUED'</span> that reports rows-affected is your claim. Resist adding Redis; the DB is enough."},
+
+    {n:6,s:"v1",short:"Dashboard",dohtml:"React dashboard: add project, deploy button, status, history.",done:"No more curl.",
+     moves:[
+       "Spin up a Vite React app.",
+       "List projects, add a project, and a Deploy button &mdash; all plain fetch calls.",
+       "Poll deployment status every 2s instead of websockets.",
+       "Show a status badge per deployment."],
+     learn:"fetch with <span class='mono'>useState</span>/<span class='mono'>useEffect</span>, controlled inputs, and interval polling with proper cleanup.",
+     trap:"You'll hit <b>CORS</b> on the first call &mdash; allow your dev origin in Spring. Clear your polling interval on unmount or it leaks."},
+
+    {n:7,s:"v1",short:"Login",dohtml:"Spring Security single-user login.",done:"Dashboard needs a login.",
+     moves:[
+       "Add Spring Security; define a single user from config/env (not hardcoded).",
+       "Protect the API and dashboard; leave health (and next week's webhook) open.",
+       "Pick form login or basic auth &mdash; one user, so keep it simple."],
+     learn:"The <span class='mono'>SecurityFilterChain</span> bean, permitting specific paths, and hashing the password with BCrypt.",
+     trap:"Don't lock yourself out of the webhook path you'll add next week. Watch CSRF settings for POSTs coming from React."},
+
+    {n:8,s:"v1",short:"Webhook deploy",dohtml:"GitHub webhook + HMAC verify. Env vars encrypted.",done:"<span class='mono'>git push</span> triggers a deploy.",ship:"v1 usable shipped",
+     moves:[
+       "Add a webhook endpoint; register it in the repo settings with a secret.",
+       "Verify the <span class='mono'>X-Hub-Signature-256</span> HMAC before trusting anything; reject on mismatch.",
+       "On a valid push to the configured branch, enqueue a deploy (reuse week 5).",
+       "Store EnvVars encrypted at rest; inject them into the container at run."],
+     learn:"Why HMAC proves the payload is really from GitHub, constant-time comparison, and symmetric encryption at rest with the key living in env, not the repo.",
+     trap:"Verify against the <b>raw</b> request body, not a re-serialized one, and compare in constant time. Never log the secret or the env values."},
+
+    {n:9,s:"v3",short:"Tests",dohtml:"Tests backwards: Playwright happy path &rarr; Testcontainers &rarr; JUnit units.",done:"<span class='mono'>mvn test</span> green.",
+     moves:[
+       "Playwright first: script the happy path (add project &rarr; deploy &rarr; see it live).",
+       "Integration: Spring Boot Test + Testcontainers spins a real Postgres; test webhook &rarr; row.",
+       "Unit last: the pure logic &mdash; port picker, status state machine, policy-input builder.",
+       "Use Mockito only at the I/O boundaries."],
+     learn:"The testing pyramid, the Testcontainers lifecycle, and what genuinely belongs in a unit test vs an integration test.",
+     trap:"Don't mock what you can test for real cheaply (the DB, via Testcontainers). Chase the risky logic, not a 100% number."},
+
+    {n:10,s:"v3",short:"CI + Trivy",dohtml:"GitHub Actions: lint &rarr; test &rarr; build &rarr; Trivy &rarr; push ECR.",done:"Red X on a bad PR.",
+     moves:[
+       "Add a workflow: on PR, build with Maven and run tests.",
+       "Build the image in CI and scan it with Trivy; fail the job on CRITICAL.",
+       "On main, push the image to ECR (you can defer the push until wk 11 exists).",
+       "Break a PR on purpose to see the red X."],
+     learn:"Actions workflow YAML (jobs / steps), caching Maven, Trivy as a step, and storing credentials as GitHub secrets.",
+     trap:"AWS keys go in <b>Actions secrets</b>, never the repo. A green pipeline that never fails isn't testing anything &mdash; prove it can fail."},
+
+    {n:11,s:"v2",short:"Terraform",dohtml:"Terraform: EC2, RDS, ECR, Route53, S3 (no app yet).",done:"<span class='mono'>terraform apply</span> &rarr; an SSH-able box.",
+     moves:[
+       "Set the billing alarm at $5 <b>before</b> anything else.",
+       "Describe: VPC + public subnet, security group, one EC2 t3.small, RDS Postgres, ECR, S3, Route53 wildcard.",
+       "Run plan, read it, then apply. SSH into the box to prove it.",
+       "Practise <span class='mono'>destroy</span> so tearing down is muscle memory."],
+     learn:"What each AWS resource is (this is your CCP study, made concrete), plus Terraform providers / resources / variables / outputs / state.",
+     trap:"<b>No NAT Gateway</b> &mdash; public subnet only (it's a ~$32/mo trap). Never open RDS to the world; guard it with a security group. Keep state and secrets out of git."},
+
+    {n:12,s:"v2",short:"Ansible + live",dohtml:"Ansible: Docker, Caddy, OPA, user, firewall. Deploy for real.",done:"Live on your domain, over HTTPS.",ship:"v2 live shipped",
+     moves:[
+       "Point an Ansible inventory at the EC2 IP.",
+       "Playbook: install Docker, Caddy, OPA, a non-root user, UFW, node_exporter + cAdvisor.",
+       "Deploy your control-plane container and point Caddy at it.",
+       "Confirm HTTPS resolves on your real domain."],
+     learn:"Ansible inventory / playbook / tasks / handlers, idempotency, and the clean split: Terraform creates, Ansible configures.",
+     trap:"Don't write Terraform and Ansible the same week. When a task fails, <b>SSH in and do it by hand first</b>, then translate. Set the DNS record early &mdash; propagation lags."},
+
+    {n:13,s:"v3",short:"Grafana",dohtml:"Prometheus + Grafana. Wire Actuator, custom metrics, one dashboard.",done:"A deploy moves a graph.",
+     moves:[
+       "Add Actuator + the Micrometer Prometheus registry; expose <span class='mono'>/actuator/prometheus</span>.",
+       "Run Prometheus to scrape your app, node_exporter and cAdvisor.",
+       "Add custom metrics: deploys total, build duration, containers running.",
+       "Build one Grafana dashboard and trigger a deploy to watch it move."],
+     learn:"Metric types (counter / gauge / histogram), how scraping works, a little PromQL, and Micrometer's meter registry.",
+     trap:"Counter vs histogram confusion will bite &mdash; pick the right type per metric. Don't leave Grafana on default admin creds if it's reachable."},
+
+    {n:14,s:"v3",short:"OPA",dohtml:"OPA admission control + <span class='mono'>opa test</span>.",done:"A bad-branch deploy is BLOCKED, with a reason.",
+     moves:[
+       "Run OPA as a service (installed in wk 12).",
+       "Write <span class='mono'>deploy.rego</span>: an <span class='mono'>allow</span> rule plus human-readable deny reasons.",
+       "Before running a container, build the JSON input (branch, scan result, running count, dockerfile present) and ask OPA.",
+       "On deny &rarr; mark BLOCKED, save the reasons, show them in the UI.",
+       "Cover the allow/deny cases with <span class='mono'>opa test</span>."],
+     learn:"Policy-as-code, Rego basics (rules, <span class='mono'>default</span>, partial sets), and OPA's REST data API.",
+     trap:"OPA only knows what you send it &mdash; get the input contract right. Test the policy in isolation with <span class='mono'>opa test</span> before wiring it into the app."},
+
+    {n:15,s:"v3",short:"Rollback + polish",dohtml:"Stretch: auto-rollback. Then ZAP scan + README + demo.",done:"Broken deploy &rarr; old version stays up.",ship:"v3 portfolio shipped",
+     moves:[
+       "After a deploy goes live, watch its <span class='mono'>/health</span> for a window.",
+       "If it regresses, keep the old container as the live one and mark the new one FAILED.",
+       "Run an OWASP ZAP baseline scan against the running app and triage findings.",
+       "Write the README (architecture diagram + the Docker-socket risk) and record a short demo."],
+     learn:"Blue-green / rollback thinking, health-check windows, and ZAP baseline vs full scans (and what a false positive looks like).",
+     trap:"Rollback is the <b>stretch</b> &mdash; if time's short, cut it per the cut order and keep the security pass + README. Never skip the README; it's what makes the whole thing legible to someone else."}
   ];
-  var REL_WEEKS={v0:[1,2,3], v1:[4,5,6,7,8], v2:[11,12], v3:[9,10,13,14,15]};
+  var RELEASES=[
+    {id:"v0",name:"spine",weeks:[1,2,3]},
+    {id:"v1",name:"usable",weeks:[4,5,6,7,8]},
+    {id:"v2",name:"live",weeks:[11,12]},
+    {id:"v3",name:"portfolio",weeks:[9,10,13,14,15]}
+  ];
   var DOD=[
     "Deploy one of your real repos by <span class='mono'>git push</span>.",
     "The app is live on an HTTPS subdomain.",
     "A broken deploy does not take down the previous version.",
-    "A policy-violating deploy is BLOCKED with a readable reason (OPA).",
-    "<span class='mono'>mvn test</span> + E2E pass in CI, with Trivy as a gate.",
-    "Server is rebuildable from Terraform + Ansible, no manual steps.",
+    "A policy-violating deploy is BLOCKED with a reason (OPA).",
+    "<span class='mono'>mvn test</span> + E2E pass in CI, Trivy as a gate.",
+    "Server rebuildable from Terraform + Ansible, no manual steps.",
     "One Grafana dashboard shows deploys + container health.",
     "README explains the architecture and the Docker-socket risk.",
     "You can defend every tool in the stack in an interview."
   ];
+  var wById={}; WEEKS.forEach(function(w){wById[w.n]=w;});
 
-  // ---- build weeks ----
+  var ribbon=document.getElementById("ribbon");
+  RELEASES.forEach(function(r){
+    var row=document.createElement("div"); row.className="rib-row";
+    var cells=r.weeks.map(function(n){return '<div class="cell" data-cell="'+n+'">'+String(n).padStart(2,"0")+'</div>';}).join("");
+    row.innerHTML='<div class="rib-tag"><b>'+r.id+'</b> '+r.name+'</div><div class="rib-cells">'+cells+'</div><div class="rib-ship" data-ship="'+r.id+'">\u25CB</div>';
+    ribbon.appendChild(row);
+  });
+
   var weeksEl=document.getElementById("weeks");
   WEEKS.forEach(function(w){
     var id="w"+w.n;
+    var movesHtml=w.moves.map(function(m){return '<li>'+m+'</li>';}).join("");
+    var detail='<div class="wk__detail">'+
+      '<div class="det-sec"><div class="det-label">Moves &mdash; what to accomplish, not how</div><ol>'+movesHtml+'</ol></div>'+
+      '<div class="det-sec"><div class="det-label">Learn / read</div><p class="det-learn">'+w.learn+'</p></div>'+
+      '<div class="det-sec det-trap"><div class="det-label">Watch out</div><p>'+w.trap+'</p></div>'+
+    '</div>';
     var li=document.createElement("li");
     li.className="wk"+(w.ship?" is-milestone":"");
-    li.id=id;li.tabIndex=0;li.setAttribute("role","checkbox");
+    li.id=id;
     li.innerHTML=
-      '<div class="wk__n">'+String(w.n).padStart(2,"0")+'<small>WEEK</small></div>'+
-      '<div class="wk__body">'+
-        '<span class="wk__stage">'+w.s+'</span>'+
-        '<div class="wk__do">'+w.do+'</div>'+
-        '<div class="wk__done">Done when: <b>'+w.done+'</b></div>'+
-        (w.ship?'<div class="shipnote">'+w.ship+'</div>':'')+
-      '</div>'+
-      '<div class="box"></div>';
-    var toggle=function(){ setDone(id, !state[id]); };
-    li.addEventListener("click",toggle);
-    li.addEventListener("keydown",function(e){ if(e.key===" "||e.key==="Enter"){e.preventDefault();toggle();} });
+      '<div class="wk__row" role="button" aria-expanded="false" tabindex="0">'+
+        '<div class="wk__n">'+String(w.n).padStart(2,"0")+'<small>WEEK</small></div>'+
+        '<div class="wk__body">'+
+          '<div class="wk__top"><span class="wk__stage">'+w.s+'</span><span class="wk__more">steps <span class="cv">\u25B8</span></span></div>'+
+          '<div class="wk__do">'+w.dohtml+'</div>'+
+          '<div class="wk__done">Done when: <b>'+w.done+'</b></div>'+
+          (w.ship?'<div class="shipnote">'+w.ship+'</div>':'')+
+        '</div>'+
+        '<div class="box" role="checkbox" aria-checked="false" tabindex="0"></div>'+
+      '</div>'+ detail;
     weeksEl.appendChild(li);
+
+    var row=li.querySelector(".wk__row");
+    var box=li.querySelector(".box");
+    var openToggle=function(){ var o=li.classList.toggle("is-open"); row.setAttribute("aria-expanded",o?"true":"false"); };
+    row.addEventListener("click",function(e){ if(e.target.closest(".box"))return; openToggle(); });
+    row.addEventListener("keydown",function(e){ if(e.target!==row)return; if(e.key===" "||e.key==="Enter"){e.preventDefault();openToggle();} });
+    box.addEventListener("click",function(e){ e.stopPropagation(); setDone(id,!state[id]); });
+    box.addEventListener("keydown",function(e){ if(e.key===" "||e.key==="Enter"){e.preventDefault();e.stopPropagation();setDone(id,!state[id]);} });
   });
 
-  // ---- build launch checklist ----
   var dodEl=document.getElementById("dod");
   DOD.forEach(function(txt,i){
     var id="d"+(i+1);
-    var li=document.createElement("li");
-    li.id=id;li.tabIndex=0;li.setAttribute("role","checkbox");
+    var li=document.createElement("li"); li.id=id; li.tabIndex=0; li.setAttribute("role","checkbox");
     li.innerHTML='<span class="dod__box"></span><span class="dod__txt">'+txt+'</span>';
-    var toggle=function(){ setDone(id,!state[id]); };
+    var toggle=function(){setDone(id,!state[id]);};
     li.addEventListener("click",toggle);
-    li.addEventListener("keydown",function(e){ if(e.key===" "||e.key==="Enter"){e.preventDefault();toggle();} });
+    li.addEventListener("keydown",function(e){if(e.key===" "||e.key==="Enter"){e.preventDefault();toggle();}});
     dodEl.appendChild(li);
   });
 
-  // ---- state ----
-  function setDone(id,val){
-    if(val){state[id]=true;}else{delete state[id];}
-    store.write(state);
-    applyOne(id,val);
-    refresh();
-  }
-  function applyOne(id,val){
-    var el=document.getElementById(id);
-    if(el){el.classList.toggle("is-done",!!val);el.setAttribute("aria-checked",val?"true":"false");}
-  }
+  function setDone(id,val){ if(val)state[id]=true; else delete state[id]; store.write(state); applyOne(id,val); refresh(); }
+  function applyOne(id,val){ var el=document.getElementById(id); if(el){el.classList.toggle("is-done",!!val); var b=el.querySelector(".box"); if(b)b.setAttribute("aria-checked",val?"true":"false"); else el.setAttribute("aria-checked",val?"true":"false");} }
+  function longestRun(){ var best=0,cur=0; for(var i=1;i<=15;i++){ if(state["w"+i]){cur++;best=Math.max(best,cur);}else cur=0;} return best; }
+  function firstRunRange(){ var s=0,bs=0,be=0,best=0,cur=0; for(var i=1;i<=15;i++){ if(state["w"+i]){ if(cur===0)s=i; cur++; if(cur>best){best=cur;bs=s;be=i;} } else cur=0;} return best?{a:bs,b:be}:null; }
+  function nextWeek(){ for(var i=1;i<=15;i++){ if(!state["w"+i]) return i; } return null; }
 
   function refresh(){
-    var done=0;
-    for(var i=1;i<=15;i++){ if(state["w"+i]) done++; }
+    var done=0,i; for(i=1;i<=15;i++){ if(state["w"+i]) done++; }
+    var pct=Math.round(done/15*100);
     document.getElementById("doneN").textContent=done;
-    document.getElementById("fill").style.width=(done/15*100)+"%";
-
-    var dot=document.getElementById("dot"), state_=document.getElementById("state"), hint=document.getElementById("hint");
-    dot.classList.toggle("is-live",done>0);
-    if(done===0){ state_.textContent="nothing deployed yet"; hint.innerHTML="Start with week 1 — nginx from a Java <span class='mono'>main()</span>. One afternoon."; }
-    else if(done===15){ state_.textContent="shipped · all weeks done"; hint.textContent="That's the whole platform. Write the README and record the demo."; }
-    else { state_.textContent="building · "+done+"/15 weeks"; hint.innerHTML="Next: week "+nextWeek()+". Keep each session to one small thing that runs."; }
-
-    // releases
-    Object.keys(REL_WEEKS).forEach(function(rel){
-      var all=REL_WEEKS[rel].every(function(n){return state["w"+n];});
-      var card=document.querySelector('.rel[data-rel="'+rel+'"]');
-      card.classList.toggle("is-shipped",all);
-      card.querySelector(".lbl").textContent=all?"shipped":"building";
+    document.getElementById("pct").textContent=pct+"%";
+    document.getElementById("pctFill").style.width=pct+"%";
+    document.getElementById("pctDelta").textContent = done===0?"start" : (done===15?"done":"+"+pct);
+    var run=longestRun(), range=firstRunRange();
+    document.getElementById("runN").textContent=run;
+    document.getElementById("runSub").textContent = run===0 ? "No streak yet \u2014 week 1 starts it" : ("week "+range.a+" \u2192 "+range.b);
+    var shipped=0, nextRel=null;
+    RELEASES.forEach(function(r){
+      var all=r.weeks.every(function(n){return state["w"+n];});
+      if(all)shipped++; else if(!nextRel)nextRel=r;
+      var s=document.querySelector('[data-ship="'+r.id+'"]');
+      s.textContent=all?"\u25CF":"\u25CB"; s.classList.toggle("is-shipped",all);
     });
+    document.getElementById("relN").textContent=shipped;
+    document.getElementById("relNext").textContent = nextRel ? (nextRel.id+" \u00B7 "+nextRel.name) : "all shipped";
+    var nw=nextWeek();
+    if(nw){ var w=wById[nw];
+      document.getElementById("nextW").textContent="W"+nw;
+      document.getElementById("nextStage").textContent=w.s;
+      document.getElementById("nextFocus").textContent=w.short;
+    } else {
+      document.getElementById("nextW").textContent="\u2713";
+      document.getElementById("nextStage").textContent="done";
+      document.getElementById("nextFocus").textContent="Ship the README + demo";
+    }
+    for(var k=1;k<=15;k++){
+      var c=document.querySelector('[data-cell="'+k+'"]');
+      c.classList.toggle("is-done",!!state["w"+k]);
+      c.classList.toggle("is-next", nw===k && !state["w"+k]);
+    }
+    var pill=document.getElementById("statusPill"), st=document.getElementById("statusText");
+    if(done===0){ pill.classList.remove("is-live"); st.textContent="15 weeks to ship"; }
+    else if(done===15){ pill.classList.add("is-live"); st.textContent="all shipped"; }
+    else { pill.classList.remove("is-live"); st.textContent=(15-done)+" weeks left"; }
+    var d=0; for(var j=1;j<=9;j++){ if(state["d"+j]) d++; }
+    document.getElementById("dodMeta").textContent=d+" / 9";
   }
-  function nextWeek(){ for(var i=1;i<=15;i++){ if(!state["w"+i]) return i; } return 15; }
 
-  // ---- restore ----
   Object.keys(state).forEach(function(id){ applyOne(id,true); });
   refresh();
 
-  // ---- reset ----
   document.getElementById("reset").addEventListener("click",function(){
-    state={};store.write(state);
-    document.querySelectorAll(".is-done").forEach(function(el){el.classList.remove("is-done");el.setAttribute("aria-checked","false");});
+    state={}; store.write(state);
+    document.querySelectorAll(".wk.is-done, .dod li.is-done").forEach(function(el){el.classList.remove("is-done");});
+    document.querySelectorAll('[role=checkbox]').forEach(function(el){el.setAttribute("aria-checked","false");});
     refresh();
   });
 })();
