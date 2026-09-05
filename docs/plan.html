@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mini-Vercel — Build Plan</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#EFF0EB;
+    --surface:#FBFBF8;
+    --surface-2:#F6F6F1;
+    --ink:#17191A;
+    --ink-soft:#585C56;
+    --ink-faint:#8D918A;
+    --line:#DEDFD8;
+    --line-soft:#E8E9E2;
+    --accent:#0C7A4A;
+    --accent-bright:#12A566;
+    --accent-wash:#E6F1EA;
+    --sans:"Geist",system-ui,-apple-system,sans-serif;
+    --serif:"Instrument Serif",Georgia,serif;
+    --mono:"Geist Mono",ui-monospace,"SF Mono",Menlo,monospace;
+    --r:5px;
+  }
+
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:var(--sans);
+    font-weight:400;
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+    padding:0 24px 96px;
+  }
+  .wrap{max-width:920px;margin:0 auto}
+
+  /* ---------- masthead ---------- */
+  .masthead{padding:56px 0 28px}
+  .eyebrow{
+    font-family:var(--mono);
+    font-size:11px;
+    font-weight:500;
+    letter-spacing:.22em;
+    text-transform:uppercase;
+    color:var(--ink-faint);
+  }
+  .title{
+    font-family:var(--serif);
+    font-weight:400;
+    line-height:.98;
+    letter-spacing:-.01em;
+    margin:14px 0 0;
+    font-size:clamp(46px,9vw,82px);
+  }
+  .title em{font-style:italic}
+  .title .plain{
+    display:block;
+    font-family:var(--sans);
+    font-weight:300;
+    font-size:clamp(17px,3.2vw,24px);
+    letter-spacing:.01em;
+    color:var(--ink-soft);
+    margin-top:12px;
+    line-height:1.3;
+  }
+  .meta{
+    display:flex;flex-wrap:wrap;gap:8px;
+    margin-top:22px;
+  }
+  .chip{
+    font-family:var(--mono);
+    font-size:11px;
+    color:var(--ink-soft);
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:999px;
+    padding:5px 11px;
+    letter-spacing:.02em;
+  }
+
+  /* ---------- deploy status / progress ---------- */
+  .status{
+    margin-top:32px;
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:var(--r);
+    padding:20px 22px;
+  }
+  .status__line{
+    display:flex;align-items:baseline;justify-content:space-between;
+    gap:16px;flex-wrap:wrap;
+  }
+  .status__state{
+    font-family:var(--mono);
+    font-size:13px;
+    color:var(--ink);
+    letter-spacing:.01em;
+    display:flex;align-items:center;gap:9px;
+  }
+  .dot{
+    width:9px;height:9px;border-radius:50%;
+    background:var(--ink-faint);flex:none;
+    transition:background .3s ease;
+  }
+  .dot.is-live{background:var(--accent-bright)}
+  .status__count{
+    font-family:var(--serif);
+    font-style:italic;
+    font-size:26px;
+    color:var(--ink);
+    line-height:1;
+  }
+  .status__count b{color:var(--accent);font-style:normal;font-family:var(--sans);font-weight:600;font-size:22px}
+  .rail{
+    margin-top:16px;height:6px;border-radius:999px;
+    background:var(--line-soft);overflow:hidden;
+  }
+  .rail__fill{
+    height:100%;width:0%;
+    background:var(--accent-bright);
+    border-radius:999px;
+    transition:width .5s cubic-bezier(.2,.7,.2,1);
+  }
+  .status__foot{
+    display:flex;justify-content:space-between;align-items:center;
+    margin-top:14px;gap:12px;flex-wrap:wrap;
+  }
+  .status__hint{font-size:12.5px;color:var(--ink-soft)}
+  .reset{
+    font-family:var(--mono);font-size:11px;letter-spacing:.04em;
+    color:var(--ink-faint);background:none;border:none;cursor:pointer;
+    padding:4px 2px;text-transform:uppercase;
+  }
+  .reset:hover{color:var(--ink)}
+
+  /* ---------- releases ---------- */
+  .releases{
+    display:grid;grid-template-columns:repeat(4,1fr);gap:10px;
+    margin-top:14px;
+  }
+  .rel{
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:var(--r);
+    padding:14px 14px 13px;
+    position:relative;overflow:hidden;
+    transition:border-color .3s ease,background .3s ease;
+  }
+  .rel.is-shipped{border-color:var(--accent);background:var(--accent-wash)}
+  .rel__tag{font-family:var(--mono);font-size:12px;font-weight:500;color:var(--ink);letter-spacing:.04em}
+  .rel__name{font-size:12px;color:var(--ink-soft);margin-top:3px}
+  .rel__st{
+    font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--ink-faint);margin-top:11px;display:flex;align-items:center;gap:6px;
+  }
+  .rel.is-shipped .rel__st{color:var(--accent)}
+  .rel__st .mini{width:6px;height:6px;border-radius:50%;background:currentColor;opacity:.55}
+  .rel.is-shipped .rel__st .mini{opacity:1}
+
+  /* ---------- section headers ---------- */
+  .sec{margin-top:52px}
+  .sec__head{
+    display:flex;align-items:baseline;gap:14px;
+    padding-bottom:12px;margin-bottom:22px;
+    border-bottom:1px solid var(--line);
+  }
+  .sec__num{font-family:var(--mono);font-size:12px;color:var(--ink-faint);letter-spacing:.1em}
+  .sec__title{font-family:var(--serif);font-style:italic;font-size:30px;font-weight:400;line-height:1}
+  .sec__sub{margin-left:auto;font-size:12.5px;color:var(--ink-soft)}
+
+  /* ---------- week list ---------- */
+  .weeks{list-style:none;display:flex;flex-direction:column;gap:9px}
+  .wk{
+    display:grid;
+    grid-template-columns:56px 1fr 24px;
+    gap:16px;align-items:start;
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-left:3px solid var(--line);
+    border-radius:var(--r);
+    padding:16px 18px;
+    cursor:pointer;
+    transition:border-color .2s ease,background .2s ease;
+  }
+  .wk:hover{border-color:var(--ink-faint)}
+  .wk:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+  .wk.is-done{border-left-color:var(--accent);background:var(--surface-2)}
+  .wk__n{
+    font-family:var(--serif);font-style:italic;font-size:30px;line-height:.9;
+    color:var(--ink-faint);transition:color .2s ease;
+  }
+  .wk.is-done .wk__n{color:var(--accent)}
+  .wk__n small{display:block;font-family:var(--mono);font-style:normal;font-size:9.5px;letter-spacing:.14em;color:var(--ink-faint);margin-top:6px}
+  .wk__body{min-width:0}
+  .wk__stage{
+    display:inline-block;font-family:var(--mono);font-size:10px;font-weight:500;
+    letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft);
+    border:1px solid var(--line);border-radius:3px;padding:1px 6px;margin-bottom:8px;
+  }
+  .wk__do{font-size:14.5px;color:var(--ink);line-height:1.45}
+  .wk__done{
+    font-family:var(--mono);font-size:11.5px;color:var(--ink-soft);
+    margin-top:9px;padding-left:14px;position:relative;line-height:1.5;
+  }
+  .wk__done::before{content:"→";position:absolute;left:0;color:var(--accent)}
+  .wk__done b{color:var(--ink);font-weight:500}
+  .box{
+    width:22px;height:22px;border:1.5px solid var(--ink-faint);border-radius:5px;
+    margin-top:3px;position:relative;flex:none;transition:.2s ease;background:var(--surface);
+  }
+  .wk.is-done .box{background:var(--accent);border-color:var(--accent)}
+  .box::after{
+    content:"";position:absolute;left:7px;top:3px;width:5px;height:10px;
+    border:solid #fff;border-width:0 2px 2px 0;transform:rotate(45deg) scale(0);
+    transition:transform .18s ease;
+  }
+  .wk.is-done .box::after{transform:rotate(45deg) scale(1)}
+
+  .shipnote{
+    grid-column:1 / -1;margin-top:2px;
+    font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--accent);display:none;align-items:center;gap:8px;
+  }
+  .wk.is-milestone.is-done .shipnote{display:flex}
+  .shipnote::before{content:"";height:1px;width:22px;background:var(--accent)}
+
+  /* ---------- launch checklist ---------- */
+  .dod{list-style:none;display:flex;flex-direction:column;gap:2px}
+  .dod li{
+    display:flex;gap:13px;align-items:flex-start;
+    padding:12px 4px;border-bottom:1px solid var(--line-soft);cursor:pointer;
+  }
+  .dod li:hover .dod__box{border-color:var(--ink)}
+  .dod li:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:3px}
+  .dod__box{
+    width:18px;height:18px;border:1.5px solid var(--ink-faint);border-radius:4px;
+    flex:none;margin-top:1px;position:relative;transition:.2s ease;
+  }
+  .dod li.is-done .dod__box{background:var(--accent);border-color:var(--accent)}
+  .dod__box::after{
+    content:"";position:absolute;left:5.5px;top:2px;width:4px;height:8px;
+    border:solid #fff;border-width:0 2px 2px 0;transform:rotate(45deg) scale(0);transition:transform .18s ease;
+  }
+  .dod li.is-done .dod__box::after{transform:rotate(45deg) scale(1)}
+  .dod__txt{font-size:14px;color:var(--ink);line-height:1.45}
+  .dod li.is-done .dod__txt{color:var(--ink-soft)}
+
+  /* ---------- reference ---------- */
+  details.ref{
+    background:var(--surface);border:1px solid var(--line);border-radius:var(--r);
+    margin-top:10px;overflow:hidden;
+  }
+  details.ref>summary{
+    cursor:pointer;list-style:none;padding:15px 18px;
+    font-family:var(--mono);font-size:12px;letter-spacing:.04em;color:var(--ink);
+    display:flex;align-items:center;justify-content:space-between;
+  }
+  details.ref>summary::-webkit-details-marker{display:none}
+  details.ref>summary .plus{color:var(--ink-faint);font-size:15px;transition:transform .2s ease}
+  details.ref[open]>summary .plus{transform:rotate(45deg)}
+  .ref__inner{padding:2px 18px 20px}
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  table td{padding:8px 10px 8px 0;border-bottom:1px solid var(--line-soft);vertical-align:top;color:var(--ink-soft)}
+  table td:first-child{color:var(--ink);font-weight:500;white-space:nowrap;padding-right:20px}
+  table tr:last-child td{border-bottom:none}
+  .mono{font-family:var(--mono);font-size:12px}
+  .cutrow{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px}
+  .cutrow .step{font-family:var(--mono);font-size:11.5px;color:var(--ink-soft);border:1px solid var(--line);border-radius:3px;padding:4px 9px}
+  .cutrow .step b{color:var(--ink)}
+  .never{margin-top:14px;font-size:12.5px;color:var(--ink)}
+  .never b{color:var(--accent)}
+  ul.rules{list-style:none;display:flex;flex-direction:column;gap:11px}
+  ul.rules li{font-size:13.5px;color:var(--ink-soft);padding-left:20px;position:relative;line-height:1.45}
+  ul.rules li::before{content:"—";position:absolute;left:0;color:var(--accent)}
+  ul.rules li b{color:var(--ink);font-weight:500}
+
+  footer{margin-top:60px;padding-top:22px;border-top:1px solid var(--line);
+    font-size:13px;color:var(--ink-soft);font-style:italic;font-family:var(--serif);line-height:1.5}
+
+  @media(max-width:640px){
+    body{padding:0 16px 72px}
+    .releases{grid-template-columns:repeat(2,1fr)}
+    .wk{grid-template-columns:42px 1fr 22px;gap:12px;padding:14px}
+    .wk__n{font-size:24px}
+    .sec__sub{display:none}
+  }
+  @media(prefers-reduced-motion:reduce){
+    *{transition:none!important}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="masthead">
+    <div class="eyebrow">Self-hosted deployment platform</div>
+    <h1 class="title"><em>Mini-Vercel</em><span class="plain">Build plan — staged so every stop is a thing that works.</span></h1>
+    <div class="meta">
+      <span class="chip">1–2h / day</span>
+      <span class="chip">no AI for code</span>
+      <span class="chip">Spring Boot · Java 21</span>
+      <span class="chip">15 weeks</span>
+    </div>
+
+    <div class="status">
+      <div class="status__line">
+        <div class="status__state"><span class="dot" id="dot"></span><span id="state">nothing deployed yet</span></div>
+        <div class="status__count"><b id="doneN">0</b> / 15 weeks</div>
+      </div>
+      <div class="rail"><div class="rail__fill" id="fill"></div></div>
+      <div class="status__foot">
+        <div class="status__hint" id="hint">Start with week 1 — nginx from a Java <span class="mono">main()</span>. One afternoon.</div>
+        <button class="reset" id="reset">reset progress</button>
+      </div>
+    </div>
+
+    <div class="releases" id="releases">
+      <div class="rel" data-rel="v0"><div class="rel__tag">v0</div><div class="rel__name">spine</div><div class="rel__st"><span class="mini"></span><span class="lbl">building</span></div></div>
+      <div class="rel" data-rel="v1"><div class="rel__tag">v1</div><div class="rel__name">usable</div><div class="rel__st"><span class="mini"></span><span class="lbl">building</span></div></div>
+      <div class="rel" data-rel="v2"><div class="rel__tag">v2</div><div class="rel__name">live</div><div class="rel__st"><span class="mini"></span><span class="lbl">building</span></div></div>
+      <div class="rel" data-rel="v3"><div class="rel__tag">v3</div><div class="rel__name">portfolio</div><div class="rel__st"><span class="mini"></span><span class="lbl">building</span></div></div>
+    </div>
+  </header>
+
+  <!-- ===== WEEKS ===== -->
+  <section class="sec">
+    <div class="sec__head">
+      <span class="sec__num">01</span>
+      <h2 class="sec__title">The build</h2>
+      <span class="sec__sub">tap a week to mark it shipped</span>
+    </div>
+    <ul class="weeks" id="weeks"></ul>
+  </section>
+
+  <!-- ===== LAUNCH CHECKLIST ===== -->
+  <section class="sec">
+    <div class="sec__head">
+      <span class="sec__num">02</span>
+      <h2 class="sec__title">Launch checklist</h2>
+      <span class="sec__sub">true when the whole thing is done</span>
+    </div>
+    <ul class="dod" id="dod"></ul>
+  </section>
+
+  <!-- ===== REFERENCE ===== -->
+  <section class="sec">
+    <div class="sec__head">
+      <span class="sec__num">03</span>
+      <h2 class="sec__title">Reference</h2>
+    </div>
+
+    <details class="ref">
+      <summary>Tech stack<span class="plus">+</span></summary>
+      <div class="ref__inner"><table>
+        <tr><td>Language</td><td>Java 21</td></tr>
+        <tr><td>Backend</td><td>Spring Boot — Web, Data JPA, Security, Actuator</td></tr>
+        <tr><td>Migrations</td><td>Flyway</td></tr>
+        <tr><td>Database</td><td>PostgreSQL</td></tr>
+        <tr><td>Docker control</td><td>docker-java <span class="mono">(fallback: ProcessBuilder + docker CLI)</span></td></tr>
+        <tr><td>Queue</td><td>DB-backed job + <span class="mono">@Scheduled</span> worker (no Redis)</td></tr>
+        <tr><td>Proxy + HTTPS</td><td>Caddy</td></tr>
+        <tr><td>Frontend</td><td>React + Vite</td></tr>
+        <tr><td>Tests</td><td>JUnit 5 + Mockito · Testcontainers · Playwright</td></tr>
+        <tr><td>CI/CD</td><td>GitHub Actions</td></tr>
+        <tr><td>Security scan</td><td>Trivy · OWASP ZAP</td></tr>
+        <tr><td>Infra</td><td>Terraform (provision) · Ansible (configure)</td></tr>
+        <tr><td>Metrics</td><td>Micrometer → Prometheus → Grafana</td></tr>
+        <tr><td>Policy</td><td>OPA + Rego</td></tr>
+      </table></div>
+    </details>
+
+    <details class="ref">
+      <summary>Cut order if you slip<span class="plus">+</span></summary>
+      <div class="ref__inner">
+        <div class="cutrow">
+          <span class="step"><b>1st</b> · auto-rollback (wk 15)</span>
+          <span class="step"><b>2nd</b> · extra Grafana panels (wk 13)</span>
+          <span class="step"><b>3rd</b> · ZAP deep triage — keep baseline</span>
+        </div>
+        <p class="never">Never cut: <b>v0 spine · one live deploy · OPA · tests.</b></p>
+      </div>
+    </details>
+
+    <details class="ref">
+      <summary>Rules that keep you moving<span class="plus">+</span></summary>
+      <div class="ref__inner"><ul class="rules">
+        <li>Start week 1 <b>today</b> — the single win the summer never gave you.</li>
+        <li><b>Ugly-but-working beats clean-but-late.</b> You can refactor a thing that runs.</li>
+        <li>If docker-java fights you, switch to the docker CLI fallback <b>fast</b> — don't lose 3 days to thin docs.</li>
+        <li><b>Never write Terraform and Ansible in the same week</b> — two mental models at once is where people quit.</li>
+        <li>When Ansible fails, do it by hand over SSH first, <b>then</b> translate to a playbook.</li>
+        <li>Set an AWS billing alarm at <b>$5</b> before creating anything. <span class="mono">terraform destroy</span> when away.</li>
+      </ul></div>
+    </details>
+  </section>
+
+  <footer>Reaching week 8 with v1 solid is already a win — and a real portfolio piece. Everything after is upside.</footer>
+
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  // ---- storage (guarded so it works locally and no-ops in sandboxes) ----
+  var KEY="minivercel-plan-v1";
+  var store={
+    read:function(){try{return JSON.parse(localStorage.getItem(KEY))||{}}catch(e){return {}}},
+    write:function(o){try{localStorage.setItem(KEY,JSON.stringify(o))}catch(e){}}
+  };
+  var state=store.read();
+
+  // ---- data ----
+  var WEEKS=[
+    {n:1, s:"v0", do:"docker-java scratch: start nginx from a <span class='mono'>main()</span>, open it, stop it.", done:"You control Docker from Java."},
+    {n:2, s:"v0", do:"Spring skeleton + Postgres (Compose) + Flyway. Entities: Project, Deployment.", done:"App boots, tables exist."},
+    {n:3, s:"v0", do:"<b>Spine:</b> endpoint → clone hardcoded repo → build → run on a port.", done:"curl → your app on <span class='mono'>localhost:4001</span>.", ship:"v0 spine shipped"},
+    {n:4, s:"v1", do:"Caddy local + free-port picker → subdomain routing.", done:"<span class='mono'>myapp.localhost</span> loads it."},
+    {n:5, s:"v1", do:"Move build to <span class='mono'>@Scheduled</span> DB-queue worker (off the request thread).", done:"Deploys queue and run one at a time."},
+    {n:6, s:"v1", do:"React dashboard: add project, deploy button, status, history.", done:"No more curl."},
+    {n:7, s:"v1", do:"Spring Security single-user login.", done:"Dashboard needs a login."},
+    {n:8, s:"v1", do:"GitHub webhook + HMAC verify. Env vars encrypted.", done:"<span class='mono'>git push</span> triggers a deploy.", ship:"v1 usable shipped"},
+    {n:9, s:"v3", do:"Tests backwards: Playwright happy path → Testcontainers → JUnit units.", done:"<span class='mono'>mvn test</span> green."},
+    {n:10,s:"v3", do:"GitHub Actions: lint → test → build → Trivy → push ECR.", done:"Red X on a bad PR."},
+    {n:11,s:"v2", do:"Terraform: EC2, RDS, ECR, Route53, S3 (no app yet).", done:"<span class='mono'>terraform apply</span> → an SSH-able box."},
+    {n:12,s:"v2", do:"Ansible: Docker, Caddy, OPA, user, firewall. Deploy for real.", done:"Live on your domain, over HTTPS.", ship:"v2 live shipped"},
+    {n:13,s:"v3", do:"Prometheus + Grafana. Wire Actuator, custom metrics, one dashboard.", done:"A deploy moves a graph."},
+    {n:14,s:"v3", do:"OPA admission control + <span class='mono'>opa test</span>.", done:"A bad-branch deploy is BLOCKED, with a reason."},
+    {n:15,s:"v3", do:"Stretch: auto-rollback. Then ZAP scan + README + demo.", done:"Broken deploy → old version stays up.", ship:"v3 portfolio shipped"}
+  ];
+  var REL_WEEKS={v0:[1,2,3], v1:[4,5,6,7,8], v2:[11,12], v3:[9,10,13,14,15]};
+  var DOD=[
+    "Deploy one of your real repos by <span class='mono'>git push</span>.",
+    "The app is live on an HTTPS subdomain.",
+    "A broken deploy does not take down the previous version.",
+    "A policy-violating deploy is BLOCKED with a readable reason (OPA).",
+    "<span class='mono'>mvn test</span> + E2E pass in CI, with Trivy as a gate.",
+    "Server is rebuildable from Terraform + Ansible, no manual steps.",
+    "One Grafana dashboard shows deploys + container health.",
+    "README explains the architecture and the Docker-socket risk.",
+    "You can defend every tool in the stack in an interview."
+  ];
+
+  // ---- build weeks ----
+  var weeksEl=document.getElementById("weeks");
+  WEEKS.forEach(function(w){
+    var id="w"+w.n;
+    var li=document.createElement("li");
+    li.className="wk"+(w.ship?" is-milestone":"");
+    li.id=id;li.tabIndex=0;li.setAttribute("role","checkbox");
+    li.innerHTML=
+      '<div class="wk__n">'+String(w.n).padStart(2,"0")+'<small>WEEK</small></div>'+
+      '<div class="wk__body">'+
+        '<span class="wk__stage">'+w.s+'</span>'+
+        '<div class="wk__do">'+w.do+'</div>'+
+        '<div class="wk__done">Done when: <b>'+w.done+'</b></div>'+
+        (w.ship?'<div class="shipnote">'+w.ship+'</div>':'')+
+      '</div>'+
+      '<div class="box"></div>';
+    var toggle=function(){ setDone(id, !state[id]); };
+    li.addEventListener("click",toggle);
+    li.addEventListener("keydown",function(e){ if(e.key===" "||e.key==="Enter"){e.preventDefault();toggle();} });
+    weeksEl.appendChild(li);
+  });
+
+  // ---- build launch checklist ----
+  var dodEl=document.getElementById("dod");
+  DOD.forEach(function(txt,i){
+    var id="d"+(i+1);
+    var li=document.createElement("li");
+    li.id=id;li.tabIndex=0;li.setAttribute("role","checkbox");
+    li.innerHTML='<span class="dod__box"></span><span class="dod__txt">'+txt+'</span>';
+    var toggle=function(){ setDone(id,!state[id]); };
+    li.addEventListener("click",toggle);
+    li.addEventListener("keydown",function(e){ if(e.key===" "||e.key==="Enter"){e.preventDefault();toggle();} });
+    dodEl.appendChild(li);
+  });
+
+  // ---- state ----
+  function setDone(id,val){
+    if(val){state[id]=true;}else{delete state[id];}
+    store.write(state);
+    applyOne(id,val);
+    refresh();
+  }
+  function applyOne(id,val){
+    var el=document.getElementById(id);
+    if(el){el.classList.toggle("is-done",!!val);el.setAttribute("aria-checked",val?"true":"false");}
+  }
+
+  function refresh(){
+    var done=0;
+    for(var i=1;i<=15;i++){ if(state["w"+i]) done++; }
+    document.getElementById("doneN").textContent=done;
+    document.getElementById("fill").style.width=(done/15*100)+"%";
+
+    var dot=document.getElementById("dot"), state_=document.getElementById("state"), hint=document.getElementById("hint");
+    dot.classList.toggle("is-live",done>0);
+    if(done===0){ state_.textContent="nothing deployed yet"; hint.innerHTML="Start with week 1 — nginx from a Java <span class='mono'>main()</span>. One afternoon."; }
+    else if(done===15){ state_.textContent="shipped · all weeks done"; hint.textContent="That's the whole platform. Write the README and record the demo."; }
+    else { state_.textContent="building · "+done+"/15 weeks"; hint.innerHTML="Next: week "+nextWeek()+". Keep each session to one small thing that runs."; }
+
+    // releases
+    Object.keys(REL_WEEKS).forEach(function(rel){
+      var all=REL_WEEKS[rel].every(function(n){return state["w"+n];});
+      var card=document.querySelector('.rel[data-rel="'+rel+'"]');
+      card.classList.toggle("is-shipped",all);
+      card.querySelector(".lbl").textContent=all?"shipped":"building";
+    });
+  }
+  function nextWeek(){ for(var i=1;i<=15;i++){ if(!state["w"+i]) return i; } return 15; }
+
+  // ---- restore ----
+  Object.keys(state).forEach(function(id){ applyOne(id,true); });
+  refresh();
+
+  // ---- reset ----
+  document.getElementById("reset").addEventListener("click",function(){
+    state={};store.write(state);
+    document.querySelectorAll(".is-done").forEach(function(el){el.classList.remove("is-done");el.setAttribute("aria-checked","false");});
+    refresh();
+  });
+})();
+</script>
+</body>
+</html>
