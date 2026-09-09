@@ -1,0 +1,1 @@
+this project is intended to be a vercel alternative built on aws infra
