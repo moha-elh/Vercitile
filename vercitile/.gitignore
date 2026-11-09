@@ -1,2 +1,7 @@
 target/*
 .idea
+# learning / AI companion files
+CLAUDE.md
+learning/
+learning-guide.md
+.claude/
